@@ -1,0 +1,102 @@
+#include "platform/implementation.oil"
+
+CPU ATMEL_AT91SAM7S256
+{
+  OS LEJOS_OSEK
+  {
+    STATUS = EXTENDED;
+    STARTUPHOOK = FALSE;
+    ERRORHOOK = FALSE;
+    SHUTDOWNHOOK = FALSE;
+    PRETASKHOOK = FALSE;
+    POSTTASKHOOK = FALSE;
+    USEGETSERVICEID = FALSE;
+    USEPARAMETERACCESS = FALSE;
+    USERESSCHEDULER = FALSE;
+  };
+
+  /* Definition of application mode */
+  APPMODE appmode1{};
+
+  /* Definition of Task1 */
+  TASK MainTask
+  {
+    AUTOSTART = FALSE;
+    /*
+    {
+      APPMODE = appmode1;
+    };*/
+    PRIORITY = 1;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512; /* Stack size */ 
+  };
+
+  
+  
+  
+   /* Definition of Task2 */
+  TASK Controller
+  {
+    AUTOSTART = FALSE;
+   
+    PRIORITY = 2;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512; /* Stack size */ 
+  };
+  
+  /* Definition of Task3 */
+  TASK Tachometer
+  {
+    AUTOSTART = FALSE;
+   
+    PRIORITY = 3;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512; /* Stack size */ 
+  };
+  
+  COUNTER SysTimerCnt
+  {
+    MINCYCLE = 1;
+    MAXALLOWEDVALUE = 99999999;
+    TICKSPERBASE = 1; /*1 tick = 1 ms*/
+  };
+  
+  ALARM periodic_alarm1{
+    COUNTER = SysTimerCnt;
+    ACTION = ACTIVATETASK{
+      TASK = MainTask;
+    };
+    AUTOSTART = TRUE{
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = appmode1;
+    };
+  };
+  
+  ALARM periodic_alarm2{
+    COUNTER = SysTimerCnt;
+    ACTION = ACTIVATETASK{
+      TASK = Controller;
+    };
+    AUTOSTART = TRUE{
+      ALARMTIME = 1;
+      CYCLETIME = 5;
+      APPMODE = appmode1;
+    };
+  };
+  
+  ALARM periodic_alarm3{
+    COUNTER = SysTimerCnt;
+    ACTION = ACTIVATETASK{
+      TASK = Tachometer;
+    };
+    AUTOSTART = TRUE{
+      ALARMTIME = 1;
+      CYCLETIME = 3;
+      APPMODE = appmode1;
+    };
+  };
+};
